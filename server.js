@@ -9,29 +9,6 @@ const io = new Server(server, {
   cors: { origin: '*' }
 });
 
-// Copy AI generated game preview assets
-const fs = require('fs');
-const assetSrc = 'C:\\Users\\ashmi\\.gemini\\antigravity-ide\\brain\\eb12a3b5-7bb2-4475-bb7f-14b5d435dfac';
-const assetDest = path.join(__dirname, 'public', 'assets');
-if (!fs.existsSync(assetDest)) fs.mkdirSync(assetDest, { recursive: true });
-
-const assetMap = {
-  'hero_banner_bg_1786488978678.png': 'hero_banner_bg.png',
-  'chaos_pong_preview_1786488662337.png': 'chaos_pong_preview.png',
-  'drawing_duel_preview_1786489411130.png': 'drawing_duel_preview.png',
-  'tank_tactics_preview_1786489426500.png': 'tank_tactics_preview.png',
-  'tug_of_war_preview_1786489443771.png': 'tug_of_war_preview.png',
-  'laser_maze_preview_1786489459458.png': 'laser_maze_preview.png',
-  'word_shot_preview_1786489473438.png': 'word_shot_preview.png'
-};
-
-for (const [src, dest] of Object.entries(assetMap)) {
-  const sPath = path.join(assetSrc, src);
-  const dPath = path.join(assetDest, dest);
-  if (fs.existsSync(sPath)) {
-    try { fs.copyFileSync(sPath, dPath); } catch (e) {}
-  }
-}
 
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, 'public')));

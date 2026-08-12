@@ -1,9 +1,16 @@
 // Frontend Lobby & Room Socket Management Script (Dracula Arcade)
 
 (function () {
-  // Configurable Socket Backend URL (Defaults to Render Cloud Backend or Localhost)
+  // Configurable Socket Backend URL
   const RENDER_BACKEND_URL = 'https://dracula-arcade-backend.onrender.com';
-  let backendUrl = localStorage.getItem('socket_server_url') || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000' : RENDER_BACKEND_URL);
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const isFirebaseHosting = window.location.hostname.endsWith('.web.app') || window.location.hostname.endsWith('.firebaseapp.com');
+
+  const defaultBackend = isLocal
+    ? 'http://localhost:3000'
+    : (isFirebaseHosting ? RENDER_BACKEND_URL : window.location.origin);
+
+  let backendUrl = localStorage.getItem('socket_server_url') || defaultBackend;
 
   let socket = null;
   function connectSocket(targetUrl) {
@@ -13,7 +20,7 @@
 
     if (typeof window !== 'undefined' && typeof window.io === 'function') {
       try {
-        socket = window.io(targetUrl || RENDER_BACKEND_URL, {
+        socket = window.io(targetUrl || backendUrl, {
           reconnectionAttempts: 5,
           timeout: 5000,
           transports: ['websocket', 'polling']
@@ -105,12 +112,6 @@
     }
   }
 
-  function generateMockRoomCode() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = '';
-    for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-    return code;
-  }
 
   // Initialize UI Event Listeners
   function initUI() {
@@ -341,18 +342,7 @@
         }
       });
     } else {
-      // Standalone / Offline / Fallback Mode
-      const mockCode = generateMockRoomCode();
-      const mockRoom = {
-        code: mockCode,
-        gameId,
-        players: [{ role: 'P1', name: playerState.name, avatar: playerState.avatar, ready: true }]
-      };
-      playerState.roomCode = mockCode;
-      playerState.role = 'P1';
-      playerState.gameId = gameId;
-      openModal(mockRoom);
-      if (window.soundEngine) window.soundEngine.playJoin();
+      alert('Connecting to live multiplayer server... Please check network status.');
     }
   }
 
@@ -376,20 +366,7 @@
         }
       });
     } else {
-      // Standalone / Offline / Fallback Mode
-      const mockRoom = {
-        code,
-        gameId: 'chaos-pong',
-        players: [
-          { role: 'P1', name: 'Host_Player', avatar: '🦇', ready: true },
-          { role: 'P2', name: playerState.name, avatar: playerState.avatar, ready: true }
-        ]
-      };
-      playerState.roomCode = code;
-      playerState.role = 'P2';
-      playerState.gameId = 'chaos-pong';
-      openModal(mockRoom);
-      if (window.soundEngine) window.soundEngine.playJoin();
+      alert('Connecting to live multiplayer server... Please check network status.');
     }
   }
 
