@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Chaos Pong Arena</title>
+  <link rel="stylesheet" href="../../style.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background: #06060c;
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    .hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 900px;
+      padding: 10px 20px;
+      background: rgba(15, 15, 25, 0.8);
+      border-bottom: 2px solid rgba(0, 243, 255, 0.3);
+      z-index: 10;
+    }
+    .player-hud {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .player-name {
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+    }
+    .score-badge {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #00f3ff;
+      font-family: monospace;
+    }
+    .score-p2 { color: #ff0055; }
+
+    .chaos-meter-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 140px;
+    }
+    .chaos-label {
+      font-size: 0.75rem;
+      color: #8a99ad;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .chaos-bar {
+      height: 10px;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .chaos-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #9d00ff, #ff0055);
+      transition: width 0.2s ease;
+    }
+
+    /* Canvas Arena */
+    #pong-canvas {
+      background: radial-gradient(circle at 50% 50%, #0d0d1c 0%, #05050a 100%);
+      border: 2px solid rgba(0, 243, 255, 0.4);
+      box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+      border-radius: 12px;
+      margin-top: 10px;
+      touch-action: none;
+    }
+
+    /* Ability Action Bar */
+    .abilities-bar {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .ability-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(0, 243, 255, 0.3);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ability-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      border-color: #333;
+    }
+    .ability-btn:not(:disabled):hover {
+      background: rgba(0, 243, 255, 0.2);
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Score HUD -->
+  <div class="hud">
+    <div class="player-hud">
+      <div class="score-badge" id="score-p1">0</div>
+      <div>
+        <div class="player-name" style="color: #00f3ff;" id="name-p1">P1 (BLUE)</div>
+        <div class="chaos-meter-container">
+          <div class="chaos-label">CHAOS METER</div>
+          <div class="chaos-bar"><div class="chaos-fill" id="chaos-fill-p1"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-weight: 900; color: #8a99ad; font-size: 0.9rem; letter-spacing: 2px;">VS</div>
+
+    <div class="player-hud">
+      <div style="text-align: right;">
+        <div class="player-name" style="color: #ff0055;" id="name-p2">P2 (PINK)</div>
+        <div class="chaos-meter-container">
+          <div class="chaos-label" style="text-align: right;">CHAOS METER</div>
+          <div class="chaos-bar"><div class="chaos-fill" id="chaos-fill-p2"></div></div>
+        </div>
+      </div>
+      <div class="score-badge score-p2" id="score-p2">0</div>
+    </div>
+  </div>
+
+  <!-- Canvas -->
+  <canvas id="pong-canvas" width="850" height="480"></canvas>
+
+  <!-- Ability Bar -->
+  <div class="abilities-bar">
+    <button class="ability-btn" id="btn-gravity" disabled>🌀 GRAVITY FLIP (100%)</button>
+    <button class="ability-btn" id="btn-wind" disabled>💨 WIND GUST (100%)</button>
+    <button class="ability-btn" id="btn-shrink" disabled>⚡ SHRINK PADDLE (100%)</button>
+  </div>
+
+  <!-- Audio Synth & Scripts -->
+  <script src="../../js/sound.js"></script>
+  <script src="../../js/cursor.js"></script>
+  <script src="chaos-pong.js"></script>
+</body>
+</html>

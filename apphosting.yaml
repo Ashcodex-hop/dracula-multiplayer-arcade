@@ -1,0 +1,7 @@
+# Firebase App Hosting Configuration for Node.js Express + Socket.io Server
+runConfig:
+  minInstances: 1
+  maxInstances: 10
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 512

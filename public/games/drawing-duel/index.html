@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Drawing & Guessing Duel</title>
+  <link rel="stylesheet" href="../../style.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #06060e;
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header.game-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: #0c0c1a;
+      border-bottom: 1px solid rgba(255, 0, 85, 0.3);
+    }
+    .hud-title { font-weight: 800; color: #ff0055; letter-spacing: 1px; }
+    .word-box {
+      font-size: 1.3rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: #00f3ff;
+      background: rgba(0, 243, 255, 0.1);
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 243, 255, 0.4);
+    }
+    .scores-row { font-size: 0.9rem; color: #8a99ad; display: flex; gap: 15px; }
+
+    /* Main Container */
+    .duel-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 60px);
+    }
+
+    /* Left: Canvas Area */
+    .canvas-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      background: #090914;
+      position: relative;
+    }
+
+    #draw-canvas {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(255, 0, 85, 0.25);
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    /* Palette Bar for Drawer */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 8px 16px;
+      border-radius: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .color-swatch {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.2s ease;
+    }
+    .color-swatch.active {
+      transform: scale(1.25);
+      border-color: #fff;
+    }
+    .tool-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 15px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    .tool-btn:hover { background: rgba(255, 255, 255, 0.25); }
+
+    /* Right: Chat & Word Selection Overlay */
+    .chat-panel {
+      width: 320px;
+      background: #0b0b18;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-messages {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .chat-msg {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    .chat-msg.correct {
+      background: rgba(0, 255, 102, 0.15);
+      border: 1px solid #00ff66;
+      color: #00ff66;
+      font-weight: 700;
+    }
+
+    .chat-input-row {
+      display: flex;
+      padding: 12px;
+      background: #070710;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .chat-input-row input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 8px 14px;
+      color: #fff;
+      outline: none;
+    }
+    .chat-input-row button {
+      background: #ff0055;
+      border: none;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      margin-left: 8px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    /* Word Choice Overlay */
+    .word-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(5, 5, 12, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .word-overlay.hidden { display: none; }
+    .word-cards-row { display: flex; gap: 15px; margin-top: 20px; }
+    .word-card {
+      background: linear-gradient(135deg, #ff0055, #9d00ff);
+      color: #fff;
+      font-weight: 900;
+      font-size: 1.2rem;
+      padding: 16px 28px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+    }
+    .word-card:hover { transform: scale(1.08); }
+  </style>
+</head>
+<body>
+
+  <header class="game-header">
+    <div class="hud-title">🎨 DRAWING & GUESSING DUEL</div>
+    <div class="word-box" id="word-display-box">SELECTING WORD...</div>
+    <div class="scores-row">
+      <div>P1: <strong id="score-p1">0</strong></div>
+      <div>P2: <strong id="score-p2">0</strong></div>
+    </div>
+  </header>
+
+  <div class="duel-container">
+    <!-- Left: Canvas Panel -->
+    <div class="canvas-panel">
+      <!-- Drawer Word Picker Overlay -->
+      <div class="word-overlay" id="word-picker-overlay">
+        <h2 style="font-size: 1.8rem; color: #ff0055;">YOU ARE THE DRAWER!</h2>
+        <p style="color: #8a99ad; margin-top: 5px;">Pick a secret word to draw:</p>
+        <div class="word-cards-row" id="word-options-container">
+          <div class="word-card">ROBOT</div>
+          <div class="word-card">DRAGON</div>
+          <div class="word-card">GUITAR</div>
+        </div>
+      </div>
+
+      <canvas id="draw-canvas" width="600" height="420"></canvas>
+
+      <!-- Drawing Toolbar (Only enabled for Drawer) -->
+      <div class="toolbar" id="drawer-toolbar">
+        <div class="color-swatch active" style="background: #000000;" data-color="#000000"></div>
+        <div class="color-swatch" style="background: #ff0055;" data-color="#ff0055"></div>
+        <div class="color-swatch" style="background: #00f3ff;" data-color="#00f3ff"></div>
+        <div class="color-swatch" style="background: #00ff66;" data-color="#00ff66"></div>
+        <div class="color-swatch" style="background: #ffcc00;" data-color="#ffcc00"></div>
+        <div class="color-swatch" style="background: #9d00ff;" data-color="#9d00ff"></div>
+        <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.2);"></div>
+        <button class="tool-btn" id="clear-canvas-btn">🗑️ CLEAR</button>
+      </div>
+    </div>
+
+    <!-- Right: Chat & Guessing Panel -->
+    <div class="chat-panel">
+      <div style="padding: 12px; background: #080812; font-weight: 700; font-size: 0.85rem; color: #8a99ad; border-bottom: 1px solid rgba(255,255,255,0.05);">
+        LIVE GUESS CHAT
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-msg" style="color: #8a99ad;">Welcome! Type your guess in the chat box below.</div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="guess-input" placeholder="Type your guess here..." maxlength="30">
+        <button id="send-guess-btn">GUESS</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/sound.js"></script>
+  <script src="../../js/cursor.js"></script>
+  <script src="drawing-duel.js"></script>
+</body>
+</html>

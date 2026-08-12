@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Type-Shooter — ZType Typing Arcade</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background: #040409;
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    [data-theme="light"] body {
+      background: #eef2f7;
+      color: #1a202c;
+    }
+
+    /* Telemetry HUD Bar */
+    header.hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 900px;
+      padding: 10px 20px;
+      background: rgba(10, 10, 20, 0.85);
+      border: 1px solid rgba(0, 243, 255, 0.3);
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+    [data-theme="light"] header.hud {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(0, 119, 255, 0.3);
+    }
+
+    .hud-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .hud-label {
+      font-size: 0.7rem;
+      color: #8a99ad;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .hud-value {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #00f3ff;
+      font-family: monospace;
+    }
+    [data-theme="light"] .hud-value { color: #0077ff; }
+
+    /* Canvas Arena */
+    #shooter-canvas {
+      background: radial-gradient(circle at 50% 50%, #0a0a18 0%, #030308 100%);
+      border: 2px solid rgba(0, 243, 255, 0.4);
+      border-radius: 14px;
+      box-shadow: 0 0 35px rgba(0, 243, 255, 0.2);
+    }
+    [data-theme="light"] #shooter-canvas {
+      background: radial-gradient(circle at 50% 50%, #ffffff 0%, #e2e8f0 100%);
+      border-color: rgba(0, 119, 255, 0.4);
+      box-shadow: 0 0 25px rgba(0, 119, 255, 0.15);
+    }
+
+    /* Results Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(4, 4, 10, 0.85);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .results-box {
+      background: #0d0d1e;
+      border: 2px solid #00f3ff;
+      border-radius: 16px;
+      box-shadow: 0 0 40px rgba(0, 243, 255, 0.4);
+      padding: 2rem;
+      width: 90%;
+      max-width: 450px;
+      text-align: center;
+    }
+    [data-theme="light"] .results-box {
+      background: #ffffff;
+      border-color: #0077ff;
+      color: #1a202c;
+    }
+    .results-rank {
+      font-size: 4rem;
+      font-weight: 900;
+      color: #ffcc00;
+      margin: 10px 0;
+      text-shadow: 0 0 20px rgba(255, 204, 0, 0.6);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 1.5rem 0;
+    }
+    .stat-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(0, 243, 255, 0.2);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .btn-restart {
+      background: linear-gradient(135deg, #00f3ff, #ff0055);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 900;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Telemetry HUD -->
+  <header class="hud">
+    <div class="hud-stat">
+      <span class="hud-label">SCORE</span>
+      <span class="hud-value" id="hud-score">0</span>
+    </div>
+    <div class="hud-stat">
+      <span class="hud-label">TYPING SPEED</span>
+      <span class="hud-value" style="color: #00ff66;" id="hud-wpm">0 WPM</span>
+    </div>
+    <div class="hud-stat">
+      <span class="hud-label">ACCURACY</span>
+      <span class="hud-value" style="color: #ffcc00;" id="hud-accuracy">100%</span>
+    </div>
+    <div class="hud-stat">
+      <span class="hud-label">SHIELD</span>
+      <span class="hud-value" style="color: #ff0055;" id="hud-shield">100%</span>
+    </div>
+  </header>
+
+  <!-- Canvas Game Arena -->
+  <canvas id="shooter-canvas" width="850" height="520"></canvas>
+
+  <!-- End of Game Results Modal -->
+  <div class="modal-overlay" id="results-modal">
+    <div class="results-box">
+      <h2 style="font-size: 1.6rem; color: #00f3ff;">MISSION COMPLETE</h2>
+      <div class="results-rank" id="res-rank">RANK S</div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div style="font-size: 0.75rem; color: #8a99ad;">FINAL WPM</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: #00ff66;" id="res-wpm">0 WPM</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-size: 0.75rem; color: #8a99ad;">ACCURACY</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: #ffcc00;" id="res-accuracy">100%</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-size: 0.75rem; color: #8a99ad;">SHIPS DESTROYED</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: #00f3ff;" id="res-ships">0</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-size: 0.75rem; color: #8a99ad;">TOTAL SCORE</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: #ff0055;" id="res-score">0</div>
+        </div>
+      </div>
+
+      <button class="btn-restart" id="btn-restart-game">🔄 PLAY AGAIN</button>
+    </div>
+  </div>
+
+  <!-- Audio Synth & Game Script -->
+  <script src="../../js/sound.js"></script>
+  <script src="type-shooter.js"></script>
+</body>
+</html>

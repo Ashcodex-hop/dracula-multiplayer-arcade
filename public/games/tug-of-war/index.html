@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>1v1 Physics Tug-of-War</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background: #080612;
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 100vh;
+      padding: 15px;
+      overflow: hidden;
+    }
+
+    header.hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 850px;
+      padding: 12px 20px;
+      background: rgba(20, 15, 30, 0.85);
+      border: 1px solid rgba(255, 204, 0, 0.4);
+      border-radius: 14px;
+    }
+    .hud-title { font-weight: 900; color: #ffcc00; letter-spacing: 1px; }
+
+    /* Rope Canvas Arena */
+    .arena-box {
+      width: 100%;
+      max-width: 850px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    #rope-canvas {
+      background: radial-gradient(circle at 50% 50%, #150f29 0%, #080612 100%);
+      border: 2px solid rgba(255, 204, 0, 0.4);
+      border-radius: 16px;
+      box-shadow: 0 0 30px rgba(255, 204, 0, 0.2);
+    }
+
+    /* Surge Bar */
+    .surge-container {
+      width: 100%;
+      max-width: 400px;
+      margin-top: 15px;
+      text-align: center;
+    }
+    .surge-label {
+      font-size: 0.8rem;
+      color: #8a99ad;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .surge-bar {
+      height: 14px;
+      background: #111;
+      border: 1px solid #444;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .surge-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ffcc00, #ff0055);
+      transition: width 0.1s linear;
+    }
+
+    /* Large Onscreen Pull Button */
+    .mash-btn-container {
+      margin-top: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-pull-mash {
+      width: 220px;
+      height: 90px;
+      background: linear-gradient(135deg, #ff0055, #ffcc00);
+      color: #fff;
+      font-size: 1.8rem;
+      font-weight: 900;
+      border: none;
+      border-radius: 45px;
+      cursor: pointer;
+      box-shadow: 0 0 30px rgba(255, 0, 85, 0.6);
+      transition: transform 0.05s ease;
+      touch-action: manipulation;
+    }
+    .btn-pull-mash:active {
+      transform: scale(0.92);
+      box-shadow: 0 0 40px rgba(255, 204, 0, 0.9);
+    }
+
+    .btn-surge {
+      background: linear-gradient(135deg, #00f3ff, #9d00ff);
+      color: #fff;
+      font-weight: 900;
+      padding: 10px 24px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+    }
+    .btn-surge:disabled { opacity: 0.3; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <header class="hud">
+    <div class="hud-title">🪢 1v1 TUG-OF-WAR</div>
+    <div style="font-weight: 800; font-size: 1.1rem; color: #ff0055;" id="winner-banner">MASH BUTTON TO PULL!</div>
+    <div style="font-size: 0.85rem; color: #8a99ad;" id="role-tag">ROLE: --</div>
+  </header>
+
+  <div class="arena-box">
+    <canvas id="rope-canvas" width="820" height="240"></canvas>
+
+    <div class="surge-container">
+      <div class="surge-label">MASH SURGE METER (SPAM TO FILL)</div>
+      <div class="surge-bar"><div class="surge-fill" id="surge-fill"></div></div>
+    </div>
+  </div>
+
+  <div class="mash-btn-container">
+    <button class="btn-pull-mash" id="pull-btn">💪 PULL!</button>
+    <button class="btn-surge" id="surge-btn" disabled>⚡ TUG SURGE (+8 PULL)</button>
+  </div>
+
+  <script src="../../js/sound.js"></script>
+  <script src="tug-of-war.js"></script>
+</body>
+</html>

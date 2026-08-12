@@ -1,0 +1,11 @@
+# Render.com Infrastructure-as-Code Configuration
+services:
+  - type: web
+    name: dracula-arcade-backend
+    env: node
+    region: oregon
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Tank Tactics — 10x10 Grid Battler</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background: #05070c;
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 10px;
+    }
+
+    header.hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 900px;
+      padding: 10px 20px;
+      background: rgba(10, 20, 15, 0.85);
+      border: 1px solid rgba(0, 255, 102, 0.3);
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+    .hud-title { font-weight: 900; color: #00ff66; letter-spacing: 1px; }
+    .turn-banner {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #ffcc00;
+      background: rgba(255, 204, 0, 0.1);
+      padding: 6px 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 204, 0, 0.4);
+    }
+
+    .grids-container {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+      width: 100%;
+      max-width: 950px;
+    }
+
+    .grid-box {
+      background: rgba(10, 15, 25, 0.9);
+      border: 2px solid rgba(0, 255, 102, 0.2);
+      border-radius: 14px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 0 20px rgba(0, 255, 102, 0.1);
+    }
+    .grid-box-title {
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+      color: #8a99ad;
+      letter-spacing: 1px;
+    }
+
+    /* 10x10 Grid */
+    .grid-board {
+      display: grid;
+      grid-template-columns: repeat(10, 32px);
+      grid-template-rows: repeat(10, 32px);
+      gap: 3px;
+      background: #09121a;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid #1a2a38;
+    }
+    .cell {
+      width: 32px;
+      height: 32px;
+      background: #0c1824;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .cell:hover {
+      background: #14283b;
+      border: 1px solid #00ff66;
+    }
+    .cell.tank { background: #008844; border: 1px solid #00ff66; }
+    .cell.hit { background: #cc0044; border: 1px solid #ff0055; animation: popHit 0.3s ease; }
+    .cell.miss { background: #1a2836; color: #4a6572; }
+
+    @keyframes popHit {
+      0% { transform: scale(1.4); }
+      100% { transform: scale(1); }
+    }
+
+    /* Placement Controls */
+    .placement-bar {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .btn-action {
+      background: linear-gradient(135deg, #00ff66, #009944);
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .btn-action:hover { transform: scale(1.05); }
+    .btn-action:disabled { opacity: 0.4; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <header class="hud">
+    <div class="hud-title">🎯 TANK TACTICS</div>
+    <div class="turn-banner" id="turn-banner">PHASE 1: PLACE TANKS</div>
+    <div style="font-size: 0.85rem; color: #8a99ad;">TANKS ALIVE: <strong id="tanks-alive-count" style="color: #00ff66;">3/3</strong></div>
+  </header>
+
+  <div class="grids-container">
+    <!-- Player's Own Grid -->
+    <div class="grid-box">
+      <div class="grid-box-title" style="color: #00ff66;">MY GRID (DEFENSE)</div>
+      <div class="grid-board" id="my-grid"></div>
+      <div class="placement-bar" id="placement-controls">
+        <button class="btn-action" id="btn-rotate-tank">🔄 ROTATE: HORIZ</button>
+        <button class="btn-action" id="btn-lock-fleet" disabled>LOCK FLEET</button>
+      </div>
+    </div>
+
+    <!-- Enemy Target Grid -->
+    <div class="grid-box">
+      <div class="grid-box-title" style="color: #ff0055;">TARGET GRID (ATTACK)</div>
+      <div class="grid-board" id="target-grid"></div>
+      <div class="placement-bar">
+        <button class="btn-action" id="btn-ability-radar" style="background: #00f3ff;" disabled>📡 RADAR (1/1)</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/sound.js"></script>
+  <script src="tank-tactics.js"></script>
+</body>
+</html>

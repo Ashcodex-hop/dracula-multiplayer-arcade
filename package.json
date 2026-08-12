@@ -1,0 +1,14 @@
+{
+  "name": "networked-multiplayer-arcade",
+  "version": "1.0.0",
+  "description": "Multi-device networked arcade portal featuring 5 distinct games with Socket.io real-time multiplayer",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}

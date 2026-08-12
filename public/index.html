@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DRACULA ARCADE — Dark Multiplayer Gaming Realm</title>
+  <meta name="description" content="AAA Dracula-inspired multi-device networked gaming platform featuring 6 real-time multiplayer games.">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <!-- Top Dracula Navbar -->
+  <header class="navbar">
+    <div class="brand" onclick="location.reload()">
+      <div class="brand-logo">🦇</div>
+      <div class="brand-title">DRACULA ARCADE</div>
+    </div>
+
+    <div class="nav-actions">
+      <!-- Theme Switcher Toggle -->
+      <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Light/Dark Theme">
+        <span id="theme-btn-icon">🌙</span> <span id="theme-btn-text">DARK MODE</span>
+      </button>
+
+      <div class="user-badge">
+        <button class="user-avatar-btn" id="avatar-toggle-btn" title="Change Avatar">🩸</button>
+        <span id="player-display-name">Vampire_Guest</span>
+        <button class="btn-secondary" id="edit-name-btn" style="padding: 2px 8px; font-size: 0.75rem;">Edit</button>
+      </div>
+      <button class="btn-secondary" id="mute-sfx-btn" title="Toggle Sound">🔊 SFX</button>
+    </div>
+  </header>
+
+  <!-- Main Arcade Dashboard -->
+  <main class="container">
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+      <h1 class="hero-title">ENTER THE DARKNESS</h1>
+      <p class="hero-subtitle">Fast, low-friction multiplayer party games. Enter live room codes to battle live across laptops, phones, and tablets.</p>
+      
+      <div class="action-bar">
+        <div class="join-input-group">
+          <input type="text" id="room-code-input" placeholder="ENTER 4-LETTER ROOM CODE..." maxlength="4">
+          <button class="btn-neon" id="join-room-btn">JOIN ROOM</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Game Catalog -->
+    <section class="catalog-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          FEATURED SUITE 
+          <span class="badge">6 GAMES UNLOCKED</span>
+        </h2>
+      </div>
+
+      <div class="catalog-grid">
+        <!-- Game 1: Chaos Pong -->
+        <article class="game-card" data-game-id="chaos-pong">
+          <div class="card-banner">
+            <img src="/assets/chaos_pong_preview.png" alt="Chaos Pong" class="card-banner-img" onerror="this.style.display='none';">
+            <span class="card-banner-icon">🏓</span>
+            <span class="card-tag">1v1 ARENA</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Chaos Pong</h3>
+            <p class="card-desc">Networked physics arena with ball prediction sync, gravity flips, wind gusts, and player chaos meters.</p>
+            <div class="card-footer">
+              <span class="card-players">👥 2 Players</span>
+              <button class="btn-neon btn-create-game" data-game-id="chaos-pong">ENTER ARENA</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Game 2: Drawing Duel -->
+        <article class="game-card" data-game-id="drawing-duel">
+          <div class="card-banner">
+            <img src="/assets/drawing_duel_preview.png" alt="Drawing Duel" class="card-banner-img" onerror="this.style.display='none';">
+            <span class="card-banner-icon">🎨</span>
+            <span class="card-tag">LIVE STREAM</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Drawing & Guessing Duel</h3>
+            <p class="card-desc">Live vector stroke packet streaming Pictionary battle with word selection and interactive guess chat.</p>
+            <div class="card-footer">
+              <span class="card-players">👥 2 Players</span>
+              <button class="btn-neon btn-neon-pink btn-create-game" data-game-id="drawing-duel">ENTER ARENA</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Game 3: Tank Tactics -->
+        <article class="game-card" data-game-id="tank-tactics">
+          <div class="card-banner">
+            <img src="/assets/tank_tactics_preview.png" alt="Tank Tactics" class="card-banner-img" onerror="this.style.display='none';">
+            <span class="card-banner-icon">🎯</span>
+            <span class="card-tag">TURN-BASED 10x10</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Tank Tactics</h3>
+            <p class="card-desc">Strategic turn-based grid battler with secret fleet placement, fog-of-war strikes, and radar abilities.</p>
+            <div class="card-footer">
+              <span class="card-players">👥 2 Players</span>
+              <button class="btn-neon btn-create-game" data-game-id="tank-tactics">ENTER ARENA</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Game 4: Tug-of-War -->
+        <article class="game-card" data-game-id="tug-of-war">
+          <div class="card-banner">
+            <img src="/assets/tug_of_war_preview.png" alt="Tug of War" class="card-banner-img" onerror="this.style.display='none';">
+            <span class="card-banner-icon">🪢</span>
+            <span class="card-tag">RAPID MASH</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">1v1 Physics Tug-of-War</h3>
+            <p class="card-desc">Server-aggregated button-mashing pull battle with dynamic rope tension and surge meter power attacks.</p>
+            <div class="card-footer">
+              <span class="card-players">👥 2 Players</span>
+              <button class="btn-neon btn-neon-pink btn-create-game" data-game-id="tug-of-war">ENTER ARENA</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Game 5: Laser Maze -->
+        <article class="game-card" data-game-id="laser-maze">
+          <div class="card-banner">
+            <img src="/assets/laser_maze_preview.png" alt="Laser Maze" class="card-banner-img" onerror="this.style.display='none';">
+            <span class="card-banner-icon">🚨</span>
+            <span class="card-tag">ASYMMETRIC CO-OP</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Co-op Laser Maze Defusal</h3>
+            <p class="card-desc">Asymmetric co-op puzzle where Player 2 operates the hacker console to clear traps for Player 1's maze agent.</p>
+            <div class="card-footer">
+              <span class="card-players">👥 2 Players</span>
+              <button class="btn-neon btn-create-game" data-game-id="laser-maze">ENTER ARENA</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Game 6: Word Shot -->
+        <article class="game-card" data-game-id="word-shot">
+          <div class="card-banner">
+            <img src="/assets/word_shot_preview.png" alt="Word Shot" class="card-banner-img" onerror="this.style.display='none';">
+            <span class="card-banner-icon">🚀</span>
+            <span class="card-tag">TYPING ARCADE</span>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">Word Shot</h3>
+            <p class="card-desc">Fast-paced arcade typing shooter! Type word targets to fire plasma bolts, progress through multi-speed levels, and track WPM.</p>
+            <div class="card-footer">
+              <span class="card-players">⚡ Solo & Duel</span>
+              <button class="btn-neon btn-neon-pink btn-create-game" data-game-id="word-shot">PLAY NOW</button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Active Public Rooms Drawer -->
+    <section class="active-rooms-panel">
+      <div class="section-header">
+        <h3 style="font-size: 1.2rem; font-weight: 800;">ACTIVE REALM ROOMS</h3>
+        <button class="btn-secondary" id="refresh-rooms-btn" style="font-size: 0.8rem;">🔄 Refresh</button>
+      </div>
+      <div class="rooms-list-grid" id="rooms-container">
+        <p style="color: var(--text-secondary); font-size: 0.9rem; grid-column: 1/-1;">No open rooms. Create one above to enter the realm!</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Dracula Room Modal -->
+  <div class="modal-overlay" id="room-modal">
+    <div class="modal-box">
+      <button class="modal-close" id="modal-close-btn">&times;</button>
+      <div class="modal-header">
+        <div style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;" id="modal-game-name">CHAOS PONG</div>
+        <h3 class="modal-title" id="modal-title-text">LOBBY WAITING ROOM</h3>
+      </div>
+
+      <div class="room-code-display">
+        <span style="font-size: 0.85rem; color: var(--text-secondary);">ROOM CODE:</span>
+        <span class="code-digits" id="modal-room-code">----</span>
+        <button class="copy-code-btn" id="copy-code-btn" title="Copy Room Code">📋</button>
+      </div>
+
+      <div class="players-lobby-grid">
+        <!-- Player 1 Slot -->
+        <div class="player-slot filled" id="slot-p1">
+          <div class="slot-avatar" id="slot-p1-avatar">🩸</div>
+          <div class="slot-name" id="slot-p1-name">Host Player</div>
+          <div class="slot-status status-ready" id="slot-p1-status">P1 (HOST)</div>
+        </div>
+
+        <!-- Player 2 Slot -->
+        <div class="player-slot" id="slot-p2">
+          <div class="slot-avatar" id="slot-p2-avatar">❓</div>
+          <div class="slot-name" id="slot-p2-name">Waiting for player...</div>
+          <div class="slot-status status-waiting" id="slot-p2-status">WAITING</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 1.5rem;">
+        <button class="btn-neon" id="ready-btn" style="flex: 1; justify-content: center;" disabled>READY / START GAME</button>
+        <button class="btn-secondary" id="leave-room-btn">LEAVE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Arena View Overlay -->
+  <div id="game-arena-overlay">
+    <div class="arena-navbar">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="brand-logo" style="font-size: 1.3rem;">🦇</div>
+        <span class="arena-title" id="arena-game-title">DRACULA ARENA</span>
+        <span style="background: rgba(229,9,20,0.15); border: 1px solid var(--red-border); color: var(--red-bright); font-size: 0.75rem; padding: 2px 8px; border-radius: 10px;" id="arena-room-tag">ROOM: ----</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button class="btn-secondary" id="arena-exit-btn">❌ EXIT TO LOBBY</button>
+      </div>
+    </div>
+    <div class="arena-content" id="arena-content-container">
+      <iframe class="game-frame" id="game-iframe"></iframe>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>DRACULA ARCADE PORTAL — Built for Real-Time Multi-Device Gaming</p>
+  </footer>
+
+  <!-- Socket.io CDN with fallback, Sound & Client Scripts -->
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script>
+    if (typeof window.io === 'undefined') {
+      window.io = function() {
+        return {
+          connected: false,
+          on: function() {},
+          emit: function(evt, data, ack) { if (typeof ack === 'function') ack([]); }
+        };
+      };
+    }
+  </script>
+  <script src="/js/sound.js"></script>
+  <script src="/js/cursor.js"></script>
+  <script src="/js/lobby.js"></script>
+</body>
+</html>

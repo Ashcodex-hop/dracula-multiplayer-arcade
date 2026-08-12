@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Word Shot — Dracula Typing Arcade</title>
+  <link rel="stylesheet" href="../../style.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background: #050505;
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Telemetry HUD Bar */
+    header.hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 900px;
+      padding: 10px 20px;
+      background: rgba(11, 11, 11, 0.9);
+      border: 1px solid rgba(229, 9, 20, 0.35);
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+
+    .hud-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .hud-label {
+      font-size: 0.7rem;
+      color: #b5b5b5;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .hud-value {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #ff1a1a;
+      font-family: monospace;
+    }
+
+    .level-badge {
+      font-size: 0.85rem;
+      font-weight: 900;
+      color: #ff1a1a;
+      background: rgba(229, 9, 20, 0.15);
+      border: 1px solid #e50914;
+      padding: 4px 12px;
+      border-radius: 15px;
+      letter-spacing: 1px;
+    }
+
+    /* Canvas Arena */
+    #shooter-canvas {
+      background: radial-gradient(circle at 50% 50%, #111111 0%, #050505 100%);
+      border: 2px solid rgba(229, 9, 20, 0.4);
+      border-radius: 14px;
+      box-shadow: 0 0 35px rgba(229, 9, 20, 0.25);
+    }
+
+    /* Results Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(3, 3, 5, 0.9);
+      backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .results-box {
+      background: #0c0c0c;
+      border: 2px solid #e50914;
+      border-radius: 16px;
+      box-shadow: 0 0 50px rgba(229, 9, 20, 0.4);
+      padding: 2rem;
+      width: 90%;
+      max-width: 460px;
+      text-align: center;
+    }
+    .results-rank {
+      font-size: 4rem;
+      font-weight: 900;
+      color: #ff1a1a;
+      margin: 10px 0;
+      text-shadow: 0 0 20px rgba(255, 26, 26, 0.6);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 1.5rem 0;
+    }
+    .stat-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(229, 9, 20, 0.25);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .btn-restart {
+      background: linear-gradient(135deg, #ff1a1a, #6d0000);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 900;
+      padding: 12px 30px;
+      border: 1px solid rgba(229, 9, 20, 0.4);
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Telemetry HUD -->
+  <header class="hud">
+    <div class="hud-stat">
+      <span class="hud-label">SCORE</span>
+      <span class="hud-value" id="hud-score">0</span>
+    </div>
+    <div class="hud-stat">
+      <span class="hud-label">TYPING SPEED</span>
+      <span class="hud-value" style="color: #ffffff;" id="hud-wpm">0 WPM</span>
+    </div>
+    <div class="hud-stat">
+      <span class="hud-label">ACCURACY</span>
+      <span class="hud-value" style="color: #ff1a1a;" id="hud-accuracy">100%</span>
+    </div>
+    <div class="hud-stat">
+      <span class="hud-label">LEVEL</span>
+      <span class="level-badge" id="hud-level">LVL 1 (EASY)</span>
+    </div>
+    <div class="hud-stat">
+      <span class="hud-label">SHIELD</span>
+      <span class="hud-value" style="color: #e50914;" id="hud-shield">100%</span>
+    </div>
+  </header>
+
+  <!-- Canvas Game Arena -->
+  <canvas id="shooter-canvas" width="850" height="520"></canvas>
+
+  <!-- End of Game Results Modal -->
+  <div class="modal-overlay" id="results-modal">
+    <div class="results-box">
+      <h2 style="font-size: 1.6rem; color: #ff1a1a;">WORD SHOT SUMMARY</h2>
+      <div class="results-rank" id="res-rank">RANK S</div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div style="font-size: 0.75rem; color: #b5b5b5;">FINAL WPM</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: #ffffff;" id="res-wpm">0 WPM</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-size: 0.75rem; color: #b5b5b5;">ACCURACY</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: #ff1a1a;" id="res-accuracy">100%</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-size: 0.75rem; color: #b5b5b5;">LEVEL REACHED</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: #e50914;" id="res-level">LEVEL 1</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-size: 0.75rem; color: #b5b5b5;">TOTAL ANNIHILATED</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: #ff1a1a;" id="res-ships">0</div>
+        </div>
+      </div>
+
+      <button class="btn-restart" id="btn-restart-game">🔄 PLAY AGAIN</button>
+    </div>
+  </div>
+
+  <!-- Audio Synth, Cursor & Game Script -->
+  <script src="../../js/sound.js"></script>
+  <script src="../../js/cursor.js"></script>
+  <script src="word-shot.js"></script>
+</body>
+</html>

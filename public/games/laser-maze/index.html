@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Co-op Laser Maze Defusal</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background: #05060f;
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 10px;
+    }
+
+    header.hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 900px;
+      padding: 12px 20px;
+      background: rgba(15, 10, 30, 0.85);
+      border: 1px solid rgba(157, 0, 255, 0.4);
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+    .hud-title { font-weight: 900; color: #9d00ff; letter-spacing: 1px; }
+    .timer-badge {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #ff0055;
+      font-family: monospace;
+    }
+
+    /* Asymmetric Views */
+    .view-container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* P1: Field Agent View */
+    #field-agent-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #maze-canvas {
+      background: #090918;
+      border: 2px solid rgba(157, 0, 255, 0.4);
+      border-radius: 14px;
+      box-shadow: 0 0 30px rgba(157, 0, 255, 0.2);
+    }
+    .dpad {
+      display: grid;
+      grid-template-columns: repeat(3, 50px);
+      gap: 6px;
+      margin-top: 15px;
+    }
+    .dpad-btn {
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(157, 0, 255, 0.4);
+      color: #fff;
+      font-size: 1.2rem;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dpad-btn:active { background: rgba(157, 0, 255, 0.4); }
+
+    /* P2: Operator Hacker Console */
+    #operator-view {
+      width: 100%;
+      max-width: 650px;
+      background: #0a0a18;
+      border: 2px solid rgba(0, 243, 255, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 0 30px rgba(0, 243, 255, 0.15);
+    }
+    .operator-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 15px;
+    }
+    .card-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #00f3ff;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+    .toggle-row {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-toggle-laser {
+      flex: 1;
+      padding: 10px;
+      background: #ff0055;
+      color: #fff;
+      font-weight: 800;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .btn-toggle-laser.off {
+      background: #222;
+      color: #777;
+    }
+
+    .code-display {
+      font-family: monospace;
+      font-size: 2rem;
+      letter-spacing: 6px;
+      color: #00ff66;
+      background: #050b08;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="hud">
+    <div class="hud-title">🚨 LASER MAZE DEFUSAL (CO-OP)</div>
+    <div class="timer-badge" id="defuse-timer">02:00</div>
+    <div style="font-size: 0.85rem; color: #8a99ad;" id="role-title">ROLE: INITIALIZING...</div>
+  </header>
+
+  <div class="view-container">
+    <!-- P1 Field Agent View -->
+    <div id="field-agent-view">
+      <div style="font-size: 0.9rem; color: #9d00ff; font-weight: 800; margin-bottom: 8px;">NAVIGATE MAZE & COLLECT KEYCARDS</div>
+      <canvas id="maze-canvas" width="600" height="420"></canvas>
+      <div class="dpad">
+        <div></div>
+        <button class="dpad-btn" id="btn-up">⬆️</button>
+        <div></div>
+        <button class="dpad-btn" id="btn-left">⬅️</button>
+        <button class="dpad-btn" id="btn-down">⬇️</button>
+        <button class="dpad-btn" id="btn-right">➡️</button>
+      </div>
+    </div>
+
+    <!-- P2 Hacker Operator Console View -->
+    <div id="operator-view" style="display: none;">
+      <div class="operator-card">
+        <div class="card-title">⚡ SECURITY LASER FREQUENCIES (TOGGLE TO CLEAR AGENT PATH)</div>
+        <div class="toggle-row">
+          <button class="btn-toggle-laser" id="toggle-laser-a" data-node="A">NODE A: ACTIVE</button>
+          <button class="btn-toggle-laser" id="toggle-laser-b" data-node="B">NODE B: ACTIVE</button>
+          <button class="btn-toggle-laser" id="toggle-laser-c" data-node="C">NODE C: ACTIVE</button>
+        </div>
+      </div>
+
+      <div class="operator-card">
+        <div class="card-title">🔑 TRANSMITTED DEFUSAL CODE DIGITS (COLLECTED BY AGENT)</div>
+        <div class="code-display" id="defuse-code-display">_ _ _</div>
+      </div>
+
+      <div class="operator-card">
+        <div class="card-title">💣 BOMB CORE DEFUSAL TERMINAL</div>
+        <div style="display: flex; gap: 10px;">
+          <input type="text" id="defuse-code-input" placeholder="ENTER 3-DIGIT CODE" maxlength="3" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid #00f3ff; color: #fff; border-radius: 8px; font-weight: 800; font-size: 1.1rem; text-align: center;">
+          <button id="submit-defuse-btn" style="background: linear-gradient(135deg, #00ff66, #009944); border: none; color: #000; font-weight: 900; padding: 10px 20px; border-radius: 8px; cursor: pointer;">DEFUSE!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/sound.js"></script>
+  <script src="laser-maze.js"></script>
+</body>
+</html>
